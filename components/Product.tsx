@@ -4,27 +4,44 @@ import { productSchema } from "@/lib/form-types";
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import Image from "next/image";
+import { useFormState } from "react-dom";
+import { s3UploadDatabase } from "@/actions/s3uploadDB";
 
 const Product = () => {
+  const formState = {
+    message: "",
+    errors: {
+      productTitle: "",
+      productDescription: "",
+      productPrice: "",
+      productImage: "",
+    },
+  };
+
+  const [state, action] = useFormState(s3UploadDatabase, formState);
   const [imagePreview, setImagePreviiew] = useState<string | null>(null);
-  async function toSubmit(data: ProductSchemaTT) {
-    await new Promise((resolve) => setTimeout(resolve, 3000));
-    console.log("data", data);
-    console.log("submitted");
-  }
+  //   async function toSubmit(data: ProductSchemaTT) {
+  //     await new Promise((resolve) => setTimeout(resolve, 3000));
+  //     console.log("data", data);
+  //     console.log("submitted");
+
+  //     await fetch("/api/s3Upload", {
+  //         method:"POST",
+  //         body:data.productImage
+  //     })
+  //   }
 
   function handleChange(event: React.ChangeEvent<HTMLInputElement>) {
     const imgUrl = URL.createObjectURL(event.target.files?.[0] as File);
     setImagePreviiew(imgUrl);
-    setValue("productImage", event.target.files?.[0] as File);
+    // setValue("productImage", event.target.files?.[0] as File);
   }
   const {
     register,
-    handleSubmit,
-    setValue,
+    // setValue,
     // setError,
     // reset,
-    formState: { errors, isSubmitting },
+    formState: { isSubmitting },
   } = useForm<ProductSchemaTT>({ resolver: zodResolver(productSchema) });
   return (
     <>
@@ -46,8 +63,13 @@ const Product = () => {
           </p>
         </div>
 
+        {state.message === "success" && (
+          <p className="text-green-600 text-center">Product Created</p>
+        )}
+
         <form
-          onSubmit={handleSubmit(toSubmit)}
+          action={action}
+          //   onSubmit={handleSubmit(toSubmit)}
           className="mx-auto mb-0 mt-8 max-w-md space-y-4"
         >
           <div>
@@ -65,8 +87,8 @@ const Product = () => {
             </div>
           </div>
 
-          {errors.productTitle && (
-            <p className="text-red-400"> {` ${errors.productTitle.message}`}</p>
+          {state.errors?.productTitle && (
+            <p className="text-red-400"> {` ${state.errors.productTitle}`}</p>
           )}
 
           {/* descr */}
@@ -87,10 +109,10 @@ const Product = () => {
             </div>
           </div>
 
-          {errors.productDescription && (
+          {state.errors?.productDescription && (
             <p className="text-red-400">
               {" "}
-              {` ${errors.productDescription.message}`}
+              {` ${state.errors.productDescription}`}
             </p>
           )}
 
@@ -111,8 +133,8 @@ const Product = () => {
             </div>
           </div>
 
-          {errors.productPrice && (
-            <p className="text-red-400"> {` ${errors.productPrice.message}`}</p>
+          {state.errors?.productPrice && (
+            <p className="text-red-400"> {` ${state.errors.productPrice}`}</p>
           )}
 
           {/*  Image*/}
@@ -171,8 +193,8 @@ const Product = () => {
             </div>
           }
 
-          {errors.productImage && (
-            <p className="text-red-400"> {` ${errors.productImage.message}`}</p>
+          {state.errors?.productImage && (
+            <p className="text-red-400"> {` ${state.errors.productImage}`}</p>
           )}
 
           <div className="flex items-center justify-between">
