@@ -7,7 +7,7 @@ import Image from "next/image";
 import { useFormState } from "react-dom";
 import { s3UploadDatabase } from "@/actions/s3uploadDB";
 import Button from "./Button";
-
+import Link from "next/link";
 const Product = () => {
   const formState = {
     message: "",
@@ -48,6 +48,14 @@ const Product = () => {
   Plugins:
     - @tailwindcss/forms
 */}
+      <Link
+        className="group inline-block rounded-full bg-gradient-to-r from-pink-500 via-red-500 to-yellow-500 p-[2px] hover:text-white focus:outline-none focus:ring active:text-opacity-75 mt-2 ml-2 text-black"
+        href={`/products`}
+      >
+        <span className="block rounded-full bg-white px-8 py-3 text-sm font-medium group-hover:bg-transparent">
+          Products
+        </span>
+      </Link>
 
       <div className="mx-auto max-w-screen-xl px-4 py-16 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-lg text-center">

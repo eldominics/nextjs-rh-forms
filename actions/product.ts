@@ -11,3 +11,13 @@ export async function createProduct(params: ProductParams) {
     console.log(error);
   }
 }
+
+export async function getProducts() {
+  try {
+    connectToMongoDB();
+    const allProducts = await Product.find({});
+    return allProducts;
+  } catch (error) {
+    console.log(error);
+  }
+}
