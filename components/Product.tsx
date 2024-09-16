@@ -1,11 +1,12 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { productSchema } from "@/lib/form-types";
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import Image from "next/image";
 import { useFormState } from "react-dom";
 import { s3UploadDatabase } from "@/actions/s3uploadDB";
+import Button from "./Button";
 
 const Product = () => {
   const formState = {
@@ -20,28 +21,24 @@ const Product = () => {
 
   const [state, action] = useFormState(s3UploadDatabase, formState);
   const [imagePreview, setImagePreviiew] = useState<string | null>(null);
-  //   async function toSubmit(data: ProductSchemaTT) {
-  //     await new Promise((resolve) => setTimeout(resolve, 3000));
-  //     console.log("data", data);
-  //     console.log("submitted");
-
-  //     await fetch("/api/s3Upload", {
-  //         method:"POST",
-  //         body:data.productImage
-  //     })
-  //   }
+  const formRef = useRef<HTMLFormElement>(null);
 
   function handleChange(event: React.ChangeEvent<HTMLInputElement>) {
+    state.errors.productImage = "";
     const imgUrl = URL.createObjectURL(event.target.files?.[0] as File);
     setImagePreviiew(imgUrl);
     // setValue("productImage", event.target.files?.[0] as File);
   }
+
+  useEffect(() => {
+    if (state.message === "success") {
+      formRef.current?.reset();
+      setImagePreviiew("");
+    }
+  }, [state]);
   const {
     register,
-    // setValue,
-    // setError,
-    // reset,
-    formState: { isSubmitting },
+    formState: {},
   } = useForm<ProductSchemaTT>({ resolver: zodResolver(productSchema) });
   return (
     <>
@@ -68,6 +65,7 @@ const Product = () => {
         )}
 
         <form
+          ref={formRef}
           action={action}
           //   onSubmit={handleSubmit(toSubmit)}
           className="mx-auto mb-0 mt-8 max-w-md space-y-4"
@@ -198,13 +196,7 @@ const Product = () => {
           )}
 
           <div className="flex items-center justify-between">
-            <button
-              disabled={isSubmitting}
-              type="submit"
-              className="inline-block rounded-lg bg-blue-500 px-5 py-3 text-sm font-medium text-white disabled:bg-gray-500"
-            >
-              {isSubmitting ? "Creating..." : "Create Product"}
-            </button>
+            <Button />
           </div>
         </form>
       </div>
