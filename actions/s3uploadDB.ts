@@ -2,6 +2,7 @@
 import { productSchema } from "@/lib/form-types";
 import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { ZodError } from "zod";
+import { createProduct } from "./product";
 
 export type DataState = {
   message: string;
@@ -48,7 +49,7 @@ export async function s3UploadDatabase(
 ) {
   try {
     const productData = Object.fromEntries(formData.entries());
-
+    console.log("prodData", productData);
     productSchema.parse(productData);
     const productImageFile = formData.get("productImage") as File;
 
@@ -61,7 +62,16 @@ export async function s3UploadDatabase(
       productImageFile.name,
       productImageFile
     );
-    console.log(imgUrl);
+
+    const imageUrl = imgUrl;
+    console.log("our image url", imageUrl);
+    await createProduct({
+      productTitle: productData.productTitle.toString(),
+      productDescription: productData.productDescription.toString(),
+      productPrice: productData.productPrice.toString(),
+      productImage: imageUrl!,
+    });
+
     prevState = {
       message: "success",
       errors: {
