@@ -15,7 +15,9 @@ const page = async () => {
           Create a product
         </span>
       </Link>
-      <div className="text-center mt-3 mb-3 text-3xl">Welcome to Products</div>
+      <div className="text-center mt-3 mb-3 text-3xl text-white">
+        Welcome to Products
+      </div>
 
       <div className="flex flex-col items-center md:flex-row md:justify-center">
         {products?.map((eachProduct, index) => (
