@@ -9,8 +9,11 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.651.0",
     "@hookform/resolvers": "^3.9.0",
     "@tailwindcss/forms": "^0.5.9",
+    "mongodb": "^6.9.0",
+    "mongoose": "^8.6.2",
     "next": "14.2.10",
     "react": "^18",
     "react-dom": "^18",

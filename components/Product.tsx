@@ -1,30 +1,44 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { productSchema } from "@/lib/form-types";
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import Image from "next/image";
-
+import { useFormState } from "react-dom";
+import { s3UploadDatabase } from "@/actions/s3uploadDB";
+import Button from "./Button";
+import Link from "next/link";
 const Product = () => {
+  const formState = {
+    message: "",
+    errors: {
+      productTitle: "",
+      productDescription: "",
+      productPrice: "",
+      productImage: "",
+    },
+  };
+
+  const [state, action] = useFormState(s3UploadDatabase, formState);
   const [imagePreview, setImagePreviiew] = useState<string | null>(null);
-  async function toSubmit(data: ProductSchemaTT) {
-    await new Promise((resolve) => setTimeout(resolve, 3000));
-    console.log("data", data);
-    console.log("submitted");
-  }
+  const formRef = useRef<HTMLFormElement>(null);
 
   function handleChange(event: React.ChangeEvent<HTMLInputElement>) {
+    state.errors.productImage = "";
     const imgUrl = URL.createObjectURL(event.target.files?.[0] as File);
     setImagePreviiew(imgUrl);
-    setValue("productImage", event.target.files?.[0] as File);
+    // setValue("productImage", event.target.files?.[0] as File);
   }
+
+  useEffect(() => {
+    if (state.message === "success") {
+      formRef.current?.reset();
+      setImagePreviiew("");
+    }
+  }, [state]);
   const {
     register,
-    handleSubmit,
-    setValue,
-    // setError,
-    // reset,
-    formState: { errors, isSubmitting },
+    formState: {},
   } = useForm<ProductSchemaTT>({ resolver: zodResolver(productSchema) });
   return (
     <>
@@ -34,6 +48,14 @@ const Product = () => {
   Plugins:
     - @tailwindcss/forms
 */}
+      <Link
+        className="group inline-block rounded-full bg-gradient-to-r from-pink-500 via-red-500 to-yellow-500 p-[2px] hover:text-white focus:outline-none focus:ring active:text-opacity-75 mt-2 ml-2 text-black"
+        href={`/products`}
+      >
+        <span className="block rounded-full bg-white px-8 py-3 text-sm font-medium group-hover:bg-transparent">
+          Products
+        </span>
+      </Link>
 
       <div className="mx-auto max-w-screen-xl px-4 py-16 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-lg text-center">
@@ -46,8 +68,14 @@ const Product = () => {
           </p>
         </div>
 
+        {state.message === "success" && (
+          <p className="text-green-600 text-center">Product Created</p>
+        )}
+
         <form
-          onSubmit={handleSubmit(toSubmit)}
+          ref={formRef}
+          action={action}
+          //   onSubmit={handleSubmit(toSubmit)}
           className="mx-auto mb-0 mt-8 max-w-md space-y-4"
         >
           <div>
@@ -65,8 +93,8 @@ const Product = () => {
             </div>
           </div>
 
-          {errors.productTitle && (
-            <p className="text-red-400"> {` ${errors.productTitle.message}`}</p>
+          {state.errors?.productTitle && (
+            <p className="text-red-400"> {` ${state.errors.productTitle}`}</p>
           )}
 
           {/* descr */}
@@ -87,10 +115,10 @@ const Product = () => {
             </div>
           </div>
 
-          {errors.productDescription && (
+          {state.errors?.productDescription && (
             <p className="text-red-400">
               {" "}
-              {` ${errors.productDescription.message}`}
+              {` ${state.errors.productDescription}`}
             </p>
           )}
 
@@ -111,8 +139,8 @@ const Product = () => {
             </div>
           </div>
 
-          {errors.productPrice && (
-            <p className="text-red-400"> {` ${errors.productPrice.message}`}</p>
+          {state.errors?.productPrice && (
+            <p className="text-red-400"> {` ${state.errors.productPrice}`}</p>
           )}
 
           {/*  Image*/}
@@ -171,18 +199,12 @@ const Product = () => {
             </div>
           }
 
-          {errors.productImage && (
-            <p className="text-red-400"> {` ${errors.productImage.message}`}</p>
+          {state.errors?.productImage && (
+            <p className="text-red-400"> {` ${state.errors.productImage}`}</p>
           )}
 
           <div className="flex items-center justify-between">
-            <button
-              disabled={isSubmitting}
-              type="submit"
-              className="inline-block rounded-lg bg-blue-500 px-5 py-3 text-sm font-medium text-white disabled:bg-gray-500"
-            >
-              {isSubmitting ? "Creating..." : "Create Product"}
-            </button>
+            <Button />
           </div>
         </form>
       </div>
